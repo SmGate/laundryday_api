@@ -25,7 +25,8 @@ return new class extends Migration
             $table->decimal('delivery_fee', 8, 2); // Decimal for currency
 
             $table->decimal('operation_fee', 8, 2); // Decimal for currency
-
+            $table->unsignedBigInteger('user_id'); // Add user_id column
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
