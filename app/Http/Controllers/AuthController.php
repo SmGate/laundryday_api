@@ -19,7 +19,26 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'profile_image' => 'required|file',
+            'identifier' => 'required|unique:users,',
+            'email' => 'nullable|email|unique:users,email',
+            'user_name' => 'nullable|unique:users,user_name',
+
+             'identifier' => [
+                'required',
+                'string',
+                'max:255',
+
+                function ($attribute, $value, $fail) use ($request) {
+                    $exists = User::where('identifier', $value)
+                        ->where('role', $request->role)
+                        ->exists();
+
+
+                    if ($exists) {
+                        $fail('The combination of identifier and role already exists.');
+                    }
+                },
+            ],
 
 
         ]);
@@ -41,18 +60,7 @@ class AuthController extends Controller
         }
         $request['image'] = $path;
 
-        // Check for existing user with email
-        $existingUserByEmail = User::where('email', $request->email)->first();
-
-        // Check for existing user with mobile number (assuming mobile_number field exists)
-        $existingUserByMobile = User::where('mobile_number', $request->mobile_number)->first();
-
-        if ($existingUserByEmail) {
-            return response()->json(['message' => 'Email Number Is Already Taken'], 409); // Conflict
-        } elseif ($existingUserByMobile) {
-            return response()->json(['message' => 'Mobile Number Is Already Taken'], 409); // Conflict
-        }
-
+    
 
 
         $user = User::create($request->all());
@@ -64,7 +72,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'user' => 'required|string', // Single field for email or phone
+            'identifier' => 'required|string', // Single field for email or phone
             'password' => 'required|string',
         ]);
 
@@ -72,14 +80,12 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 403);
         }
 
-        $login = $request->input('user');
+        $login = $request->input('identifier');
 
 
-        if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
-            $credentials = ['email' => $login, 'password' => $request->password]; // Add password for email login
-        } else {
-            $credentials = ['mobile_number' => $login, 'password' => $request->password]; // Add password for phone login
-        }
+       
+            $credentials = ['identifier' => $login, 'password' => $request->password]; // Add password for email login
+        
 
 
 

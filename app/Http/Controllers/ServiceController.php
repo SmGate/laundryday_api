@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\service;
 use Illuminate\Support\Facades\Validator;
@@ -11,12 +12,12 @@ class ServiceController extends Controller
     public function addService(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'service_name' => 'required|string',
-            'service_name_arabic' => 'required|string',
+            'service_name' => 'required|string|unique:services,service_name',
+            'service_name_arabic' => 'required|string|unique:services,service_name_arabic',
             'image' => 'required|file',
             'delivery_fee' => 'required|numeric',
             'operation_fee' => 'required|numeric',
-            'user_id' => 'required|numeric',
+            'user_id' => 'required|exists:users,id',
 
 
         ]);
@@ -81,6 +82,8 @@ class ServiceController extends Controller
     public function deleteService($id)
     {
         $service = Service::findOrFail($id);
+        
+        Storage::delete('public/'.$service->service_image);
 
         $service->delete();
 
