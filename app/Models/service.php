@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class service extends Model
+class Service extends Model
 {
 
 
-     
+
     use HasFactory;
 
     /**
@@ -27,4 +27,12 @@ class service extends Model
         'operation_fee',
         'user_id'
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function category()
+    {
+        return $this->belongsTo(category::class);
+    }
 }

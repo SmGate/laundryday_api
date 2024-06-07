@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CountryController;
@@ -43,9 +44,21 @@ Route::post('login', [AuthController::class, 'login']);
 
 
 ////  SERVICE
+
+Route::post('addService', [ServiceController::class, 'addService']);
+Route::get('allService', [ServiceController::class, 'getAllServices']);
+Route::put('updateService/{id}', [ServiceController::class, 'update']);
+Route::delete('deleteService/{id}', [ServiceController::class, 'deleteService']);
+
+
+////  CATEGORY
+
+Route::post('addCategory', [CategoryController::class, 'addCategory']);
+Route::get('allCategory', [CategoryController::class, 'getAllCategory']);
+Route::put('updateCategory/{id}', [CategoryController::class, 'updateCategory']);
+Route::delete('deleteCategory/{id}', [CategoryController::class, 'deleteCategory']);
+
+
+
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('addService', [ServiceController::class, 'addService']);
-    Route::get('allService', [ServiceController::class, 'getAllServices']);
-    Route::put('updateService/{id}', [ServiceController::class, 'update']);
-    Route::delete('deleteService/{id}', [ServiceController::class, 'deleteService']);
 });

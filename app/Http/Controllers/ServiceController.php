@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Storage;
 
-use App\Models\service;
+use App\Models\Service;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,7 @@ class ServiceController extends Controller
         $validator = Validator::make($request->all(), [
             'service_name' => 'required|string|unique:services,service_name',
             'service_name_arabic' => 'required|string|unique:services,service_name_arabic',
-            'image' => 'required|file',
+            'image' => 'nullable|file',
             'delivery_fee' => 'required|numeric',
             'operation_fee' => 'required|numeric',
             'user_id' => 'required|exists:users,id',
@@ -36,7 +37,7 @@ class ServiceController extends Controller
             $path = 'services/' . $imageName;
         }
         $request['service_image'] = $path;
-        $service = service::create($request->all());
+        $service = Service::create($request->all());
 
         return response()->json(['message' => 'Service Added successfully!', 'data' => $service], 201); // Include created user data (optional)
     }
@@ -82,8 +83,8 @@ class ServiceController extends Controller
     public function deleteService($id)
     {
         $service = Service::findOrFail($id);
-        
-        Storage::delete('public/'.$service->service_image);
+
+        Storage::delete('public/' . $service->service_image);
 
         $service->delete();
 
