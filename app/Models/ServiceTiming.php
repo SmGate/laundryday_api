@@ -9,6 +9,8 @@ class ServiceTiming extends Model
 {
     use HasFactory;
 
+    protected $table = 'servicetimings';
+
     protected $fillable = [
         'name',
         'arabic_name',

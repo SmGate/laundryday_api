@@ -8,6 +8,7 @@ use App\Http\Controllers\CountryController;
 use App\Http\Controllers\StateController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\ServiceTimingController;
 use App\Http\Controllers\UserController;
 
 /*
@@ -59,6 +60,14 @@ Route::put('updateCategory/{id}', [CategoryController::class, 'updateCategory'])
 Route::delete('deleteCategory/{id}', [CategoryController::class, 'deleteCategory']);
 
 
+
+
+////  Service Timing
+
+Route::post('addServiceTiming', [ServiceTimingController::class, 'addServiceTiming']);
+Route::get('getAllServiceTiming', [ServiceTimingController::class, 'getAllServiceTiming']);
+Route::delete('deleteServiceTiming/{id}', [ServiceTimingController::class, 'deleteServiceTiming']);
+Route::post('updateServiceTiming/{id}', [ServiceTimingController::class, 'updateServiceTiming']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
 });
