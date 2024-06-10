@@ -35,4 +35,12 @@ class Service extends Model
     {
         return $this->belongsTo(category::class);
     }
+      protected $casts = [
+        "user_id" => 'integer',
+        "delivery_fee" => 'double',
+        "operation_fee" => 'double'
+        
+        // 'status' => 'integer',
+
+    ];
 }

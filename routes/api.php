@@ -47,7 +47,7 @@ Route::post('login', [AuthController::class, 'login']);
 
 Route::post('addService', [ServiceController::class, 'addService']);
 Route::get('allService', [ServiceController::class, 'getAllServices']);
-Route::put('updateService/{id}', [ServiceController::class, 'update']);
+Route::put('updateService', [ServiceController::class, 'update']);
 Route::delete('deleteService/{id}', [ServiceController::class, 'deleteService']);
 
 
