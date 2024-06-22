@@ -10,6 +10,7 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ServiceTimingController;
+use App\Http\Controllers\LaundryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,28 +45,41 @@ Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
 
-////  SERVICE
+////  SERVICES
 
 Route::post('addService', [ServiceController::class, 'addService']);
 Route::get('allService', [ServiceController::class, 'getAllServices']);
-Route::post('updateService', [ServiceController::class, 'update']);
+Route::put('updateService', [ServiceController::class, 'update']);
 Route::delete('deleteService/{id}', [ServiceController::class, 'deleteService']);
 
 
-////  CATEGORY
+////  CATEGORIES
 
 Route::post('addCategory', [CategoryController::class, 'addCategory']);
 Route::get('allCategory', [CategoryController::class, 'getAllCategory']);
-Route::put('updateCategory/{id}', [CategoryController::class, 'updateCategory']);
+Route::post('updateCategory', [CategoryController::class, 'updateCategory']);
 Route::delete('deleteCategory/{id}', [CategoryController::class, 'deleteCategory']);
 
-////  Service Timing
+////  Service Timings
 
-Route::post('addServiceTiming', [ServiceTimingController::class, 'addServiceTiming']);
-Route::get('getAllServiceTiming', [ServiceTimingController::class, 'getAllServiceTiming']);
-Route::delete('deleteServiceTiming/{id}', [ServiceTimingController::class, 'deleteServiceTiming']);
-Route::post('updateServiceTiming/{id}', [ServiceTimingController::class, 'updateServiceTiming']);
+Route::post('add-service-timing', [ServiceTimingController::class, 'addServiceTiming']);
+Route::get('service-timings', [ServiceTimingController::class, 'getAllServiceTiming']);
+Route::delete('delete-service-timing/{id}', [ServiceTimingController::class, 'deleteServiceTiming']);
+Route::post('update-service-timing', [ServiceTimingController::class, 'updateServiceTiming']);
 
+
+// Laundries
+Route::prefix('laundries')->group(function () {
+Route::post('/register', [LaundryController::class, 'register']);
+Route::post('/verify', [LaundryController::class, 'verify']);
+Route::delete('delete/{id}', [LaundryController::class, 'delete']);
+Route::get('all', [LaundryController::class, 'all']);
+Route::post('update', [LaundryController::class, 'update']);
+
+
+
+    
+});
 
 Route::middleware(['auth:sanctum'])->group(function () {
 });

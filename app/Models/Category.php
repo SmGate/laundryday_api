@@ -22,4 +22,12 @@ class Category extends Model
     {
         return $this->hasOne(Service::class,'id','service_id');
     }
+
+      protected $casts = [
+        "user_id" => 'integer',
+        "service_id" => 'integer',
+        
+        // 'status' => 'integer',
+
+    ];
 }

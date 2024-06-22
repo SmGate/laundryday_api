@@ -17,23 +17,28 @@ class CategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'arabic_name' => 'required|string|max:255',
-            'image' => 'nullable|file', // Optional image field
+            'image' => 'nullable|string',
             'service_id' => 'required|integer|exists:services,id', // Ensures service_id exists
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json(
+             [ "errors"=> $validator->errors()]
+            , 403);
         }
 
-
-        $image = $request->file('category_image');
-        $path = '';
-        if ($image != null) {
-            $imageName = time() . "." . $image->extension();
-            $image->move(public_path('/storage/category'), $imageName);
-            $path = 'category/' . $imageName;
-        }
+    $base64Image = $request->input('image');
+    $path = null;
+    if ($base64Image) {
+        
+        $image = base64_decode($base64Image);
+        $imageName = time() . ".png";
+        $imagePath = public_path('/storage/categories/' . $imageName);
+        file_put_contents($imagePath, $image);
+        $path = 'categories/' . $imageName;
         $request['image'] = $path;
+
+    }
 
         $category = Category::create($request->all());
 
@@ -63,38 +68,45 @@ class CategoryController extends Controller
 
 
     //////////  UPDATE CATEGORY
-    public function updateCategory(Request $request, $id)
+    public function updateCategory(Request $request)
     {
         // Validate the request data
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'arabic_name' => 'required|string|',
-            'image' => 'nullable|file', // Optional image field
-            'service_id' => 'required|integer|exists:services,id', // Ensures service_id exists
+            'image' => 'nullable|string',
+            'service_id' => 'required|integer|exists:services,id',
+            'id' => 'required|exists:categories,id',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+         if ($validator->fails()) {
+            return response()->json(
+             [ "errors"=> $validator->errors()]
+            , 403);
         }
 
 
-        $category = Category::find($id);
-
-        if (!$category) {
-            return response()->json([
-                'message' => 'Category not found!'
-            ], 404);
-        }
+ $category = Category::findOrFail($request->id);
 
 
-        $image = $request->file('category_image');
-        $path = $category->image;
+    $base64Image = $request->input('image');
+    $path =null;
+    if ($base64Image) {
+        
+        Storage::delete('public/' . $category->image);
+        $image = base64_decode($base64Image);
+        $imageName = time() . ".png";
+        $imagePath = public_path('/storage/categories/' . $imageName);
+        file_put_contents($imagePath, $image);
+        $path = 'categories/' . $imageName;
+        $request['image'] = $path;
 
-        if ($image != null) {
-            $imageName = time() . "." . $image->extension();
-            $image->move(public_path('/storage/category'), $imageName);
-            $path = 'category/' . $imageName;
-        }
+    }
+
+       
+
+
+
 
 
         $category->update([
@@ -111,30 +123,15 @@ class CategoryController extends Controller
     }
 
 
-    //////// DELETE IMAGE
 
     public function deleteCategory($id)
     {
 
-        $category = Category::find($id);
+        $category = Category::findOrFail($id);
+
+        Storage::delete('public/' . $category->image);
 
 
-        if (!$category) {
-            return response()->json([
-                'message' => 'Category not found!'
-            ], 404);
-        }
-
-
-        $file_path = public_path($category->image);
-
-
-        if (File::exists($file_path)) {
-
-            File::delete($file_path);
-        }
-
-        // Delete the category
         $category->delete();
 
         return response()->json([

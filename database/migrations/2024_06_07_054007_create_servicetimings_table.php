@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('arabic_name')->nullable();;
             $table->text('description')->nullable();;
             $table->text('arabic_description')->nullable();;
-            $table->integer('duration')->nullable();;
-            $table->enum('type', ['min', 'second', 'hour'])->nullable();;
+            $table->integer('duration')->nullable();
+            $table->enum('type', ['min', 'second', 'hour','day'])->nullable();;
             $table->string('arabic_type')->nullable();
             $table->string('image')->nullable();
             $table->foreignId('service_id')->constrained('services')->onDelete('cascade');

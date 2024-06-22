@@ -41,7 +41,7 @@ class ServiceController extends Controller
 
 
    $base64Image = $request->input('image');
-    $path = '';
+    $path = null;
 
     if ($base64Image) {
         
@@ -56,7 +56,7 @@ class ServiceController extends Controller
 
         $path = 'services/' . $imageName;
 
-                $request['service_image'] = $path;
+       $request['service_image'] = $path;
 
     }
         $service = Service::create($request->all());
@@ -82,9 +82,9 @@ class ServiceController extends Controller
     {
         
          $validator = Validator::make($request->all(), [
-            'service_name' => 'required|string|unique:services,service_name',
-            'service_name_arabic' => 'required|string|unique:services,service_name_arabic',
-            // 'image' => 'nullable|string',
+            // 'service_name' => 'required|string|unique:services,service_name',
+            // 'service_name_arabic' => 'required|string|unique:services,service_name_arabic',
+
             'delivery_fee' => 'required|numeric',
             'operation_fee' => 'required|numeric',
             'user_id' => 'required|exists:users,id',
@@ -176,7 +176,6 @@ class ServiceController extends Controller
         ], 200);
     }
 
-    //////////  DELETE SERVICE
     public function deleteService($id)
     {
         $service = Service::findOrFail($id);
@@ -190,14 +189,5 @@ class ServiceController extends Controller
         ], 200);
     }
 
-     private function getImageInfo($base64Image)
-    {
-        // Extract the image data and determine the file extension
-        if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $matches)) {
-            $data = substr($base64Image, strpos($base64Image, ',') + 1);
-            $extension = $matches[1];
-            return ['data' => $data, 'extension' => $extension];
-        }
-        throw new \Exception('Invalid base64 image data');
-    }
+   
 }

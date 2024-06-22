@@ -38,6 +38,9 @@ class AuthController extends Controller
                         $fail('The combination of identifier and role already exists.');
                     }
                 },
+            
+            
+            
             ],
 
 

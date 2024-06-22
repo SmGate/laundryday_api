@@ -20,6 +20,7 @@ class Service extends Model
     protected $fillable = [
         'service_name',
         'service_name_arabic',
+    
         'service_description',
         'service_description_arabic',
         'service_image',
@@ -38,9 +39,14 @@ class Service extends Model
       protected $casts = [
         "user_id" => 'integer',
         "delivery_fee" => 'double',
+
         "operation_fee" => 'double'
         
         // 'status' => 'integer',
 
     ];
+
+    // app/Models/User.php
+
+
 }

@@ -6,6 +6,7 @@ use App\Models\ServiceTiming;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class ServiceTimingController extends Controller
 {
@@ -19,25 +20,33 @@ class ServiceTimingController extends Controller
             'description' => 'required|string',
             'arabic_description' => 'required|string',
             'duration' => 'required|integer',
-            'type' => 'required|in:min,second,hour',
+            'type' => 'required|in:min,second,hour,day',
             'arabic_type' => 'required|string|max:255',
-            'image' => 'nullable|image|max:2048', // Assuming it's an image file with maximum size of 2MB
+            'image' => 'nullable|string',
             'service_id' => 'required|exists:services,id',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+           if ($validator->fails()) {
+            return response()->json(
+             [ "errors"=> $validator->errors()]
+            , 403);
         }
 
 
-        $image = $request->file('service_timing_image');
-        $path = '';
-        if ($image != null) {
-            $imageName = time() . "." . $image->extension();
-            $image->move(public_path('/storage/serviceTiming'), $imageName);
-            $path = 'serviceTiming/' . $imageName;
-        }
+
+
+    $base64Image = $request->input('image');
+    $path = '';
+    if ($base64Image) {
+        
+        $image = base64_decode($base64Image);
+        $imageName = time() . ".png";
+        $imagePath = public_path('/storage/service_timings/' . $imageName);
+        file_put_contents($imagePath, $image);
+        $path = 'service_timings/' . $imageName;
         $request['image'] = $path;
+
+    }
 
 
         $serviceTiming = ServiceTiming::create($request->all());
@@ -73,24 +82,10 @@ class ServiceTimingController extends Controller
     public function deleteServiceTiming($id)
     {
 
-        $serviceTiming = ServiceTiming::find($id);
+        $serviceTiming = ServiceTiming::findOrFail($id);
 
-
-        if (!$serviceTiming) {
-            return response()->json([
-                'message' => 'Not found!'
-            ], 404);
-        }
-
-
-        $file_path = public_path($serviceTiming->image);
-
-
-        if (File::exists($file_path)) {
-
-            File::delete($file_path);
-        }
-
+        Storage::delete('public/' .   $serviceTiming->image);
+        
 
         $serviceTiming->delete();
 
@@ -102,7 +97,7 @@ class ServiceTimingController extends Controller
 
 
     //////////  UPDATE Service
-    public function updateServiceTiming(Request $request, $id)
+    public function updateServiceTiming(Request $request)
     {
         // Validate the request data
         $validator = Validator::make($request->all(), [
@@ -110,43 +105,49 @@ class ServiceTimingController extends Controller
             'arabic_name' => 'required|string|',
             'description' => 'required|string|',
             'arabic_description' => 'required|string|',
-            'image' => 'nullable|file', // Optional image field
-            'service_id' => 'required|integer|exists:services,id', // Ensures service_id exists
+            'image' => 'nullable|string',
+            'service_id' => 'required|integer|exists:services,id', 
+             'id' => 'required|exists:servicetimings,id',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+           if ($validator->fails()) {
+            return response()->json(
+             [ "errors"=> $validator->errors()]
+            , 403);
         }
 
 
-        $serviceTiming = ServiceTiming::find($id);
-
-        if (!$serviceTiming) {
-            return response()->json([
-                'message' => 'Not found!'
-            ], 404);
-        }
+        $serviceTiming = ServiceTiming::findOrFail($request->id);
 
 
-        $image = $request->file('service_timing_image');
-        $path = $serviceTiming->image;
+  $base64Image = $request->input('image');
+    $path =null;
+    if ($base64Image) {
+        
+        
+ Storage::delete('public/' .   $serviceTiming->image);
+    
+        
+       
+        $image = base64_decode($base64Image);
+        $imageName = time() . ".png";
+        $imagePath = public_path('/storage/service_timings/' . $imageName);
+        file_put_contents($imagePath, $image);
+        $path = 'service_timings/' . $imageName;
+        $request['image'] = $path;
 
-        if ($image != null) {
-            $imageName = time() . "." . $image->extension();
-            $image->move(public_path('/storage/serviceTiming'), $imageName);
-            $path = 'serviceTiming/' . $imageName;
-        }
+    }
+
 
 
         $serviceTiming->update([
             'name' => $request->get('name', $serviceTiming->name),
             'arabic_name' => $request->get('arabic_name', $serviceTiming->arabic_name),
-
-
             'description' => $request->get('description', $serviceTiming->description),
-
-
             'arabic_description' => $request->get('arabic_description', $serviceTiming->arabic_description),
+            'type' => $request->get('type', $serviceTiming->type),
+            'arabic_type' => $request->get('arabic_type', $serviceTiming->arabic_type),
+           'duration' => $request->get('duration', $serviceTiming->duration),
             'image' => $path,
             'service_id' => $request->get('service_id', $serviceTiming->service_id),
         ]);

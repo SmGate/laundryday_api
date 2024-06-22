@@ -27,4 +27,13 @@ class ServiceTiming extends Model
     {
         return $this->hasOne(Service::class, 'id', 'service_id');
     }
+
+
+      protected $casts = [
+        "duration" => 'integer',
+        "service_id" => 'integer',
+        
+        // 'status' => 'integer',
+
+    ];
 }
